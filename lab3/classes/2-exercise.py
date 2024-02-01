@@ -1,23 +1,13 @@
-class Shape:
-    def __init__(self):
-        pass
-
+class Shape():
     def area(self):
         return 0
-
 class Square(Shape):
-    def __init__(self, length):
-        super().__init__()
-        self.length = length
-
+    def __init__(self,length):
+        self.length=length
     def area(self):
-        return self.length * self.length
-
-# Example usage:
-# Create instances of Shape and Square
-shape_instance = Shape()
-square_instance = Square(5)
-
-# Call the area function for both instances
-print("Area of Shape:", shape_instance.area())  # Output: 0
-print("Area of Square:", square_instance.area())  # Output: 25
+        return self.length ** 2
+a = float(input("a:"))
+mysquare=Square(a)
+print("sharshy audany:",mysquare.area())
+myshape=Shape()
+print("Basqa:",myshape.area())
