@@ -1,27 +1,32 @@
 import math
 
-class Point():
-    def __init__(self, x, y, z) -> None:
+class Point:
+    def __init__(self,x,y):
         self.x = x
         self.y = y
-        self.z = z
 
     def show(self):
-        self.x = float(input("x:"))
-        self.y = float(input("y:"))
-        self.z = float(input("z:"))
+        print(f"Coordinates: ({self.x}, {self.y})")
 
-    def dist(self):
-        x1 = float(input("x1:"))
-        y1 = float(input("y1:"))
-        z1 = float(input("z1:"))
-        return math.sqrt((x1 - self.x)**2 + (y1 - self.y)**2 + (z1 - self.z)**2)
+    def move(self, x1, y1):
+        self.x = x1
+        self.y = y1
 
-initial_x = float(input("Initial x:"))
-initial_y = float(input("Initial y:"))
-initial_z = float(input("Initial z:"))
+    def dist(self, point2):
+        dx = self.x - point2.x
+        dy = self.y - point2.y
+        distance = math.sqrt(dx**2 + dy**2)
+        return distance
+a=float(input("x:"))
+b=float(input("y:"))
+point1 = Point(a,b)
+point2 = Point(a,b)
 
-point = Point(initial_x, initial_y, initial_z)
-point.show()
-distance = point.dist()
-print("Distance between points:", distance)
+point1.show() 
+k=float(input("x1:"))
+p=float(input("y1:"))
+point1.move(k,p)
+point1.show() 
+
+distance = point1.dist(point2)
+print(f"Distance between point1 and point2: {distance}")
