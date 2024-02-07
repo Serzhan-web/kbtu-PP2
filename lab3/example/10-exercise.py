@@ -48,7 +48,7 @@ rectangle = Rectangle(length, width)
 print(rectangle)
 print("Area:", rectangle.getArea()) 
 
-radius=int(input("redius:"))
+radius=int(input())
 circle = Circle(radius)
 print(circle)
 print("Area:", circle.getArea())  
