@@ -8,7 +8,7 @@ class MyShape:
 
     def getArea(self):
         return 0
-
+    
 my_shape = MyShape()
 print(my_shape)
 print("Area:", my_shape.getArea())
