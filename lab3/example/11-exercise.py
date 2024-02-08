@@ -22,17 +22,18 @@ class Rectangle(MyShape):
         return self.length * self.width
 
     def __str__(self):
-        return f"Rectangle: color={self.color}, is_filled={self.is_filled}, x_top_left={self.x_top_left}, " \
+        return f"Rectangle: {super().__str__()}, x_top_left={self.x_top_left}, " \
                f"y_top_left={self.y_top_left}, length={self.length}, width={self.width}"
 
+color_input = input("Enter color for Rectangle: ").strip() or "Blue"
+x_input = float(input("Enter x coordinate : ").strip() or 0)
+y_input = float(input("Enter y coordinate : ").strip() or 0)
+length_input = float(input("Enter the length of the rectangle : ").strip() or 1)
+width_input = float(input("Enter the width of the rectangle: ").strip() or 1)
 
-color_input = input("Enter color for Rectangle (default is Blue): ").strip() or "Blue"
-x_input = float(input("Enter x coordinate of the top-left corner (default is 0): ").strip() or 0)
-y_input = float(input("Enter y coordinate of the top-left corner (default is 0): ").strip() or 0)
-length_input = float(input("Enter the length of the rectangle (default is 1): ").strip() or 1)
-width_input = float(input("Enter the width of the rectangle (default is 1): ").strip() or 1)
 
 user_rectangle = Rectangle(color=color_input, x_top_left=x_input, y_top_left=y_input, length=length_input, width=width_input)
+
 
 print(user_rectangle)
 print("Area:", user_rectangle.getArea())

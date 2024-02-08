@@ -11,7 +11,7 @@ class MyShape:
 
 
 class Rectangle(MyShape):
-    def __init__(self, color="Blue", is_filled=True, x_top_left=0, y_top_left=0, length=1, width=1):
+    def __init__(self, length, width, color="Red", is_filled=True, x_top_left=0, y_top_left=0):
         super().__init__(color, is_filled)
         self.x_top_left = x_top_left
         self.y_top_left = y_top_left
@@ -19,7 +19,7 @@ class Rectangle(MyShape):
         self.width = width
 
     def getArea(self):
-        return self.length * self.width
+        return self.width * self.length
 
     def __str__(self):
         return f"Rectangle: color={self.color}, is_filled={self.is_filled}, x_top_left={self.x_top_left}, " \
@@ -27,7 +27,7 @@ class Rectangle(MyShape):
 
 
 class Circle(MyShape):
-    def __init__(self, color="Green", is_filled=True, x_center=0, y_center=0, radius=1):
+    def __init__(self, radius, color="Red", is_filled=True, x_center=0, y_center=0):
         super().__init__(color, is_filled)
         self.x_center = x_center
         self.y_center = y_center
@@ -35,20 +35,24 @@ class Circle(MyShape):
 
     def getArea(self):
         import math
-        return math.pi * self.radius ** 2
+        return self.radius**2 * math.pi
 
     def __str__(self):
         return f"Circle: color={self.color}, is_filled={self.is_filled}, x_center={self.x_center}, " \
                f"y_center={self.y_center}, radius={self.radius}"
 
-length=int(input("length:"))
-width=int(input("width:"))
 
+myShape = MyShape()
+print(myShape)
+print("Area:", myShape.getArea())
+
+length = int(input("length: "))
+width = int(input("width: "))
 rectangle = Rectangle(length, width)
 print(rectangle)
-print("Area:", rectangle.getArea()) 
+print("Area:", rectangle.getArea())
 
-radius=int(input())
+radius = int(input("radius: "))
 circle = Circle(radius)
 print(circle)
-print("Area:", circle.getArea())  
+print("Area:", circle.getArea())
