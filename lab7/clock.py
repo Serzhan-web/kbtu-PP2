@@ -28,7 +28,7 @@ while not done:
     
     #минут пен сикундтың бұрышын алып аламыз
     #қазіргі минут * 360 градус / 60 минут + қазіргі секундты қосамыз 
-    minute_angle = minute * 6 + (second / 60) * 6   
+    minute_angle = minute * 6    + (second / 60) * 6   
     second_angle = second * 6  
     
     #экран бетіне пайда фонмен болуы

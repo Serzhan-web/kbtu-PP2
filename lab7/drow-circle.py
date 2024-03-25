@@ -1,25 +1,26 @@
 import pygame
 pygame.init()
 
-window_size = (800, 600)
-screen = pygame.display.set_mode(window_size)
+#окно ұзындықтары,аты,түсі,артқы фон түсі
+window_size = (800, 600) 
+screen = pygame.display.set_mode(window_size) 
 pygame.display.set_caption("Draw circle")
 ball_color = pygame.Color('red')
 bg_color = pygame.Color('white')
 
-ball_pos = [400, 300]
+ball_pos = [400, 300] #шардың пайда болу аймағы
 
-ball_radius = 25
+ball_radius = 25 #шар радиусы
 
-speed = 20
+speed = 20 #шар жылдамдығы
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
+    keys = pygame.key.get_pressed() #клавиштың барлық жерін алады
+    if keys[pygame.K_UP]: 
         ball_pos[1] = max(ball_pos[1] - speed, ball_radius)
     if keys[pygame.K_DOWN]:
         ball_pos[1] = min(ball_pos[1] + speed, window_size[1] - ball_radius)
