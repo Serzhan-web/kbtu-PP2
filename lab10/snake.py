@@ -1,244 +1,194 @@
+import psycopg2
 import pygame
 import sys
 import copy
 import random
 import time
 import psycopg2
+from color_palette import *
+conn = psycopg2.connect(host="localhost", dbname="lab10", user="postgres",
+                        password="Almaty250505", port=5433)   
+ 
+cur = conn.cursor()
+ 
+conn.set_session(autocommit=True)
+name = input("Enter your username: ")
 
-print("Enter your name")
-name = input()
 
-db = psycopg2.connect(dbname='Lab10', user='postgres', password='1234', host='localhost')
-current = db.cursor()
+cur.execute("""
+    SELECT level, score FROM snake WHERE username = %s ORDER BY score DESC LIMIT 1
+""", (name,))
 
-sql="""
-    CREATE TABLE IF NOT EXISTS Scores(
-        player_name VARCHAR,
-        player_score VARCHAR
-    );
-"""
-current.execute(sql)
+result = cur.fetchone()
+if result:
+    level, high_score = result
+    print(f"Welcome back, {name}! Your current level is {level} and your high score is {high_score}.")
+else:
+    level = 1
+    high_score = 0
+    print(f"Welcome, {name}! You are starting at level 1.")
+
 
 pygame.init()
 
-scale = 10
-score = 0
-level = 0
-SPEED = 10
 
-food_x = 10
-food_y = 10
+WIDTH = 600
+HEIGHT = 600
+CELL = 30
+FPS = 5 + level - 1  
 
-bomb_x = 15
-bomb_y = 15
 
-display = pygame.display.set_mode((500, 500))
-pygame.display.set_caption("Snake Game")
-clock = pygame.time.Clock()
+screen = pygame.display.set_mode((HEIGHT, WIDTH))
 
-background = (0, 0, 0)
-snake_colour = (255, 137, 0)
-food_colour = (0, 255, 0)
-bomb_colour = (255, 0, 210)
-snake_head = (255, 247, 0)
-font_colour = (255, 255, 255)
-defeat_colour = (255, 0, 0)
+def draw_grid_chess():
+    colors = [colorWHITE, colorGRAY]
+    for i in range(HEIGHT // 2):
+        for j in range(WIDTH // 2):
+            pygame.draw.rect(screen, colors[(i + j) % 2], (i * CELL, j * CELL, CELL, CELL))
 
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return f"{self.x}, {self.y}"
 
 class Snake:
-    def __init__(self, x_start, y_start):
-        self.x = x_start
-        self.y = y_start
-        self.w = 10
-        self.h = 10
-        self.x_dir = 1
-        self.y_dir = 0
-        self.history = [[self.x, self.y]]
-        self.length = 1
+    def __init__(self):
+        self.body = [Point(10, 11), Point(10, 12), Point(10, 13)]
+        self.dx = 1
+        self.dy = 0
 
-    def reset(self):
-        self.x = 500 / 2 - scale
-        self.y = 500 / 2 - scale
-        self.w = 10
-        self.h = 10
-        self.x_dir = 1
-        self.y_dir = 0
-        self.history = [[self.x, self.y]]
-        self.length = 1
+    def move(self):
+        for i in range(len(self.body) - 1, 0, -1):
+            self.body[i].x = self.body[i - 1].x
+            self.body[i].y = self.body[i - 1].y
 
-    def show(self):
-        for i in range(self.length):
-            if not i == 0:
-                pygame.draw.rect(display, snake_colour, (self.history[i][0], self.history[i][1], self.w, self.h))
-            else:
-                pygame.draw.rect(display, snake_head, (self.history[i][0], self.history[i][1], self.w, self.h))
+        self.body[0].x += self.dx
+        self.body[0].y += self.dy
 
-    def check_eaten(self):
-        if abs(self.history[0][0] - food_x) < scale and abs(self.history[0][1] - food_y) < scale:
-            return True
+    def draw(self):
+        head = self.body[0]
+        pygame.draw.rect(screen, colorRED, (head.x * CELL, head.y * CELL, CELL, CELL))
+        for segment in self.body[1:]:
+            pygame.draw.rect(screen, colorYELLOW, (segment.x * CELL, segment.y * CELL, CELL, CELL))
 
-    def check_bomb(self):
-        if abs(self.history[0][0] - bomb_x) < scale and abs(self.history[0][1] - bomb_y) < scale:
-            return True
-
-    def level(self):
-        global level
-        if self.length % 5 == 0:
-            return True
-
-    def grow(self):
-        self.length += 1
-        self.history.append(self.history[self.length - 2])
-
-    def death(self):
-        i = self.length - 1
-        while i > 0:
-            if abs(self.history[0][0] - self.history[i][0]) < self.w and abs(
-                    self.history[0][1] - self.history[i][1]) < self.h and self.length > 2:
-                return True
-            i -= 1
-
-    def update(self):
-        i = self.length - 1
-        while i > 0:
-            self.history[i] = copy.deepcopy(self.history[i - 1])
-            i -= 1
-        self.history[0][0] += self.x_dir * scale
-        self.history[0][1] += self.y_dir * scale
-
+    def check_collision(self, food):
+        head = self.body[0]
+        if head.x == food.pos.x and head.y == food.pos.y:
+            self.body.append(Point(head.x, head.y))
 
 class Food:
-    def new_location(self):
-        global food_x, food_y
-        food_x = random.randrange(1, 500 / scale - 1) * scale
-        food_y = random.randrange(1, 500 / scale - 1) * scale
+    def __init__(self, snake):
+        self.snake = snake
+        self.pos = self.generate_position()
+        self.timer_start = time.time()  
+        self.timer_duration = random.randint(3, 6)  
+        self.score = random.choice([1, 2, 5])  
 
-    def show(self):
-        pygame.draw.rect(display, food_colour, (food_x, food_y, scale, scale))
+    def generate_position(self):
+        while True:
+            x = random.randint(0, WIDTH // CELL - 1)
+            y = random.randint(0, HEIGHT // CELL - 1)
+            if Point(x, y) not in  self.snake.body:
+                return Point(x, y)
 
+    def draw(self):
+        pygame.draw.rect(screen, colorGREEN, (self.pos.x * CELL, self.pos.y * CELL, CELL, CELL))
 
-class Bomb:
-    def new_location(self):
-        global bomb_x, bomb_y
-        bomb_x = random.randrange(1, 500 / scale - 1) * scale
-        bomb_y = random.randrange(1, 500 / scale - 1) * scale
+    def is_expired(self):
+        return time.time() - self.timer_start > self.timer_duration
 
-    def show(self):
-        pygame.draw.rect(display, bomb_colour, (bomb_x, bomb_y, scale, scale))
+snake = Snake()
+food = None
 
+score = 0
+is_paused = False
 
-def show_score():
-    font = pygame.font.SysFont(None, 20)
-    text = font.render("Score: " + str(score), True, font_colour)
-    display.blit(text, (scale, scale))
+clock = pygame.time.Clock()
+done = False
 
+while not done:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            done = True
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:  # Pause the game with 'P'
+                is_paused = not is_paused
+                if is_paused:
+                    print("Game Paused")
+                   
+                    cur.execute("""
+                        INSERT INTO snake_scores (username, level, score)
+                        VALUES (%s, %s, %s)
+                    """, (name, level, score))
+                    conn.commit()
+                else:
+                    print("Game Resumed")
 
-def show_level():
-    font = pygame.font.SysFont(None, 20)
-    text = font.render("Level: " + str(level), True, font_colour)
-    display.blit(text, (90 - scale, scale))
+            if not is_paused:
+                if event.key == pygame.K_RIGHT:
+                    snake.dx = 1
+                    snake.dy = 0
+                elif event.key == pygame.K_LEFT:
+                    snake.dx = -1
+                    snake.dy = 0
+                elif event.key == pygame.K_DOWN:
+                    snake.dx = 0
+                    snake.dy = 1
+                elif event.key == pygame.K_UP:
+                    snake.dx = 0
+                    snake.dy = -1
 
-def show_name():
-    font = pygame.font.SysFont(None, 20)
-    text = font.render("Player: " + name, True, font_colour)
-    display.blit(text, (350 - scale, scale))
+    if is_paused:
+        continue
 
+    head = snake.body[0]
+    if head.x < 0 or head.x >= WIDTH // CELL or head.y < 0 or head.y >= HEIGHT // CELL:
+        print("Game Over!")
+        done = True
 
+    draw_grid_chess()
 
+    snake.move()
 
-def gameLoop():
-    global score
-    global level
-    global SPEED
+    if food is None or food.is_expired():
+        food = Food(snake)
 
-    snake = Snake(500 / 2, 500 / 2)
-    food = Food()
-    food.new_location()
+    snake.check_collision(food)
 
-    bomb = Bomb()
-    bomb.new_location()
+    if snake.body[0].x == food.pos.x and snake.body[0].y == food.pos.y:
+        score += food.score  
+        food = Food(snake)  
+        if score % 3 == 0:
+            FPS += 1
+            level += 1  
 
-    def defeat(score):
-        sql = """
-                INSERT INTO Scores VALUES(%s, %s) returning *;
-            """
-        current.execute(sql, (name, score))
-        db.commit()
-        display.fill(background)
-        score = 0
-        level = 0
-        SPEED = 10
-        font1 = pygame.font.SysFont(None, 100)
-        text1 = font1.render("Game Over!", True, defeat_colour)
-        display.blit(text1, (50, 200))
-        pygame.display.update()
-        time.sleep(3)
-        snake.reset()
+    snake.draw()
+    food.draw()
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
-                    pygame.quit()
-                    sys.exit()
-                if snake.y_dir == 0:
-                    if event.key == pygame.K_w:
-                        snake.x_dir = 0
-                        snake.y_dir = -1
-                    if event.key == pygame.K_s:
-                        snake.x_dir = 0
-                        snake.y_dir = 1
+    font = pygame.font.Font(None, 36)
+    score_text = font.render(f"Score: {score}", True, (0, 100, 0))
+    level_text = font.render(f"Level: {level}", True, (255, 0, 0))
+    screen.blit(score_text, (10, 10))
+    screen.blit(level_text, (10, 50))
 
-                if snake.x_dir == 0:
-                    if event.key == pygame.K_a:
-                        snake.x_dir = -1
-                        snake.y_dir = 0
-                    if event.key == pygame.K_d:
-                        snake.x_dir = 1
-                        snake.y_dir = 0
-
-        display.fill(background)
-
-        snake.show()
-        snake.update()
-        food.show()
-        bomb.show()
-        show_score()
-        show_level()
-        show_name()
-
-        if snake.check_eaten():
-            food.new_location()
-            score += random.randint(1, 5)
-            snake.grow()
-
-        if snake.check_bomb():
-            defeat(score)
-
-        if snake.level():
-            food.new_location()
-            level += 1
-            SPEED += 3
-            snake.grow()
-
-        if snake.death():
-            defeat(score)
-
-        if snake.history[0][0] > 500:
-            snake.history[0][0] = 0
-        if snake.history[0][0] < 0:
-            snake.history[0][0] = 500
-
-        if snake.history[0][1] > 500:
-            snake.history[0][1] = 0
-        if snake.history[0][1] < 0:
-            snake.history[0][1] = 500
-
-        pygame.display.update()
-        clock.tick(SPEED)
+    pygame.display.flip()
+    clock.tick(FPS)
 
 
-gameLoop()
+cur.execute("""
+    INSERT INTO snake (username, level, score)
+    VALUES (%s, %s, %s)
+""", (name, level, score))
+
+conn.commit()  
+cur.execute("""DELETE FROM snake
+           WHERE score = 3
+""")
+conn.commit()
+cur.close()
+conn.close()
+
+pygame.quit()
