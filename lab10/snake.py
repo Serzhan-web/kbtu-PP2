@@ -24,7 +24,7 @@ food_counter = 0
  
 fps = pygame.time.Clock() 
 paused = False 
- 
+
 def insert_score(name, score, level): 
     conn = psycopg2.connect(dbname='lab10', user='postgres', password='Almaty250505', host='localhost', port='5433') 
     cur = conn.cursor() 

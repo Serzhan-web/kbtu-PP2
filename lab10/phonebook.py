@@ -16,15 +16,15 @@ cur.execute("""CREATE TABLE IF NOT EXISTS phonebook (
 
 )
 """)
-filepath = "/Users/bekzatshaiyrgozha/Documents/PP2/lab10/student.csv"  
-with open(filepath, 'r') as f:
+#filepath = "/Users/bekzatshaiyrgozha/Documents/PP2/lab10/student.csv"  
+#with open(filepath, 'r') as f:
    
-    next(f)
-    reader = csv.reader(f)
-    for row in reader:
-        cur.execute("INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
+#    next(f)
+#    reader = csv.reader(f)
+#    for row in reader:
+#        cur.execute("INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
 
-conn.commit()
+#conn.commit()
 
 
 check = True
@@ -95,6 +95,7 @@ while check:
             command = ''
             phone_var = str(input('Type phone number which you want to delete: '))
             cur.execute("DELETE FROM phonebook WHERE phone = %s", (phone_var,))
+            conn.commit()
             back_com = str(input('Type "back" in order to return to the list of the commands: '))
             if back_com == "back":
                 back = True
@@ -108,6 +109,7 @@ while check:
                 name_var = str(input("Enter name that you want to change: "))
                 name_upd = str(input("Enter the new name: "))
                 cur.execute("UPDATE phonebook SET name = %s WHERE name = %s", (name_upd, name_var))
+                conn.commit()
                 back_com = str(input('Type "back" in order to return to the list of the commands: '))
                 if back_com == "back":
                     back = True
