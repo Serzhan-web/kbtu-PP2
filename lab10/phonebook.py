@@ -16,6 +16,16 @@ cur.execute("""CREATE TABLE IF NOT EXISTS phonebook (
 
 )
 """)
+filepath = "/Users/bekzatshaiyrgozha/Documents/PP2/lab10/student.csv"  
+with open(filepath, 'r') as f:
+   
+    next(f)
+    reader = csv.reader(f)
+    for row in reader:
+        cur.execute("INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
+
+conn.commit()
+
 
 check = True
 command = ''
