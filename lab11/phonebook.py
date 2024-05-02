@@ -36,11 +36,13 @@ def update_data():
     value = input(f"Enter {column} that you want to change: ")
     new_value = input(f"Enter the new {column}: ")
     cur.execute(f"UPDATE phonebook SET {column} = %s WHERE {column} = %s", (new_value, value))
+    conn.commit()
 
 def delete_data():
     phone = input('Type phone number which you want to delete: ')
     cur.execute("DELETE FROM phonebook WHERE phone = %s", (phone,))
-
+    conn.commit()
+    
 def query_data():
     column = input("Type the name of the column which will be used for searching data: ")
     value = input(f"Type {column} of the user: ")
