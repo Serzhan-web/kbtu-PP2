@@ -8,7 +8,7 @@ cur = conn.cursor()
 conn.set_session(autocommit=True)
 
 cur.execute("""CREATE TABLE if not exists snake(
-            username VARCHAR(255),
+            name VARCHAR(255),
             level INTEGER,
             score INTEGER
 );
