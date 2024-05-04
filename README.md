@@ -1,0 +1,1 @@
+- second semester, all laboratory work in python
