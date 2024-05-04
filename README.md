@@ -1,23 +1,23 @@
-- second semester, all laboratory work in python
+- SECOND SEMESTER, ALL LABORATORY WORK IN PYTHON
 
-- Topics
+- TOPICS
   
 - L1. Python fundamentals.
-Python Intro
-Python User Input
-Python Get Started
-Python Syntax
-Python Comments
-Python Variables
-Python Data Types
-Python Numbers
-Python Casting
-Python Strings
-Python String Formatting
-Python Booleans
-Python Operators
-Python If...Else
-Git
+ Python Intro
+ Python User Input
+ Python Get Started
+ Python Syntax
+ Python Comments
+ Python Variables
+ Python Data Types
+ Python Numbers
+ Python Casting
+ Python Strings
+ Python String Formatting
+ Python Booleans
+ Python Operators
+ Python If...Else
+ Git
 
 -L2. Python fundamentals.
 Python While Loops
