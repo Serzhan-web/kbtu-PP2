@@ -1,5 +1,5 @@
-- SECOND SEMESTER, ALL LABORATORY WORK IN PYTHON
-
+- SECOND SEMESTER, ALL LABORATORY WORK IN PYTHON🐍
+--------------------------------------------------
 - TOPICS
   
 - L1. Python fundamentals.
