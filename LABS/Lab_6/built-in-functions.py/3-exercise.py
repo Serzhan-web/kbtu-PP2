@@ -11,3 +11,4 @@ def polindrom(soilem,teris_soilem):
 sentence=str(input("enter sentence:"))
 soilem_reverse=''.join(reversed(sentence))
 print(polindrom(sentence,soilem_reverse))
+#
