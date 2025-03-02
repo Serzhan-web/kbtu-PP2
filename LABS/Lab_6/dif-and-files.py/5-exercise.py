@@ -9,3 +9,4 @@ def writesome(list_of_elements):
  
 
 writesome([12345, 56789, 90987654, "dfghjkl","efrgf",34,34])
+#
