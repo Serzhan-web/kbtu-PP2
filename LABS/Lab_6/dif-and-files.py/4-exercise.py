@@ -6,3 +6,4 @@ with open("sometext.txt") as f:
 
 print(len(list(data.split("\n"))))
 f.close()
+#
