@@ -7,7 +7,6 @@ playlist = []
 music_folder = "/Users/Lenovo/Desktop/All_Labs/LABS/Lab_7/musics"
 allmusic = os.listdir(music_folder)
 
-# Добавляем в плейлист если оканчивается ".mp3"
 for song in allmusic:
     if song.endswith(".mp3"):
         playlist.append(os.path.join(music_folder, song))
@@ -15,7 +14,6 @@ screen = pygame.display.set_mode((800, 800))
 pygame.display.set_caption("Musics")
 clock = pygame.time.Clock()
 
-# Добавляем задний фон)
 background = pygame.image.load(os.path.join("LABS/Lab_7/music-elements", "background.png"))
 
 bg = pygame.Surface((500, 200))
