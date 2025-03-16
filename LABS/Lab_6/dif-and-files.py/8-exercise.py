@@ -20,4 +20,4 @@ def delete_file(file_path):
 path_delete=str(input("path_delere_file:"))
 
 delete_file(path_delete)
-
+#

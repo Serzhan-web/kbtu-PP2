@@ -20,5 +20,6 @@ def check_access(path):
 
 if __name__ == "__main__":
     path_to_check = r"C:/Users/bekzatshaiyrgozha/Documents"
+    #
     
 check_access(path_to_check)
