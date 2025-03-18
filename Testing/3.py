@@ -27,7 +27,7 @@ x = 30
 y = 30
 
 # Загружаем изображение → создаём surface
-image = pygame.image.load('ball.png')
+image = pygame.image.load('Testing/ball.png')
 
 while not done:
     # Выход из игры
@@ -54,7 +54,7 @@ while not done:
         color = (255, 100, 0)
 
     # Рисуем Ректангл(Прямоугольник)
-    pygame.draw.rect(screen, color, pygame.Rect(x, y, 60, 60))
+    pygame.draw.circle(screen, color, (x, y), 30, 10)
 
     # Рисуем изображение на экран в точке (50, 50)
     screen.blit(image, (50, 50))

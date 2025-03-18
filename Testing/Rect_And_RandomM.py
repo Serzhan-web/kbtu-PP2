@@ -3,7 +3,6 @@ import os
 
 # Заготовка для кэширования изображений
 _image_library = {}
-
 def get_image(path):
     image = _image_library.get(path)
     if image is None:
@@ -13,7 +12,19 @@ def get_image(path):
         _image_library[path] = image
     return image
 
+def play_a_different_song():
+    global _currently_playing_song, _songs
+    next_song = random.choice(_songs)
+    while next_song == _currently_playing_song: next_song = random.choice(_songs)
+    _currently_playing_song = next_song
+    pygame.mixer.music.load(next_song)
+    pygame.mixer.music.play()
+
 pygame.init()
+
+_songs = ["LABS/Lab_7/musics/Golden.mp3", "LABS/Lab_7/musics/Let_Me_Love_You.mp3", "LABS/Lab_7/musics/Quem Desiste.mp3", "LABS/Lab_7/musics/En-sulu.mp3", "LABS/Lab_7/musics/Hush.mp3"]
+_currently_playing_song = None
+
 screen = pygame.display.set_mode((400, 300))
 done = False
 clock = pygame.time.Clock()
@@ -23,7 +34,7 @@ x = 30
 y = 30
 
 # Загружаем изображение через кэш
-image = get_image('ball.png')
+image = get_image('Testing/ball.png')
 
 while not done:
     # Выход из игры
@@ -34,6 +45,7 @@ while not done:
         # Условие (Нажатие на клавишу и если эта клавиша "ПРОБЕЛ")
         if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             is_blue = not is_blue  # Меняем цвет при пробеле
+            play_a_different_song()
 
     screen.fill((0, 0, 0))  # Очистка экрана
 
@@ -42,6 +54,7 @@ while not done:
     if pressed[pygame.K_DOWN]: y += 10
     if pressed[pygame.K_LEFT]: x -= 10
     if pressed[pygame.K_RIGHT]: x += 10
+    
 
     # Выбор цвета по флагу
     if is_blue:
@@ -57,3 +70,6 @@ while not done:
 
     pygame.display.flip()
     clock.tick(60)
+
+
+    import random

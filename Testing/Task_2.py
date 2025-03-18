@@ -1,6 +1,6 @@
 import re
 
-sentence = "Hello World This Is Python"
+sentence = "Hello World this Is Python"
 letter = re.split(" ", sentence)
 print(letter)
 
