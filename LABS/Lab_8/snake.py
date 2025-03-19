@@ -4,7 +4,7 @@ import copy  # Импортируем модуль copy для создания 
 import random  # Импортируем модуль random для работы с случайными числами
 import time  # Импортируем модуль time для работы со временем
 
-pygame.init()  # Инициализируем Pygame
+pygame.init()
 
 # Устанавливаем параметры игры
 scale = 15  # Масштаб объектов
@@ -12,13 +12,14 @@ score = 0  # Счет игрока
 level = 0  # Уровень игры
 SPEED = 10  # Скорость движения змейки
 
-food_x = 10  # Координата x для еды
-food_y = 10  # Координата y для еды
+# Координаты еды
+food_x = 10
+food_y = 10
 
 # Создаем окно для отображения игры
 display = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("Snake Game")  # Устанавливаем заголовок окна
-clock = pygame.time.Clock()  # Создаем объект Clock для управления временем в игре
+clock = pygame.time.Clock()
 
 # Определяем цвета в формате RGB
 background_top = (0, 0, 50)  # Цвет верхнего уровня фона
@@ -32,10 +33,14 @@ defeat_colour = (255, 0, 0)  # Цвет при проигрыше
 # Определяем класс Snake для создания объекта змейки
 class Snake:
     def __init__(self, x_start, y_start):
-        self.x = x_start  # Координата x начального положения змейки
-        self.y = y_start  # Координата y начального положения змейки
-        self.w = 15  # Ширина змейки
-        self.h = 15  # Высота змейки
+        # Координата начального положения змейки
+        self.x = x_start
+        self.y = y_start
+
+        # Размер змейки
+        self.w = 15
+        self.h = 15
+
         self.x_dir = 1  # Направление движения по оси x (1 - вправо, -1 - влево)
         self.y_dir = 0  # Направление движения по оси y (1 - вниз, -1 - вверх)
         self.history = [[self.x, self.y]]  # История перемещений змейки
@@ -45,8 +50,11 @@ class Snake:
     def reset(self):
         self.x = 500 / 2 - scale  # Возвращаем змейку в центр по оси x
         self.y = 500 / 2 - scale  # Возвращаем змейку в центр по оси y
-        self.w = 15  # Сбрасываем ширину змейки
-        self.h = 15  # Сбрасываем высоту змейки
+
+        # Сбрасываем размер змейки
+        self.w = 15
+        self.h = 15
+        
         self.x_dir = 1  # Сбрасываем направление по оси x
         self.y_dir = 0  # Сбрасываем направление по оси y
         self.history = [[self.x, self.y]]  # Сбрасываем историю перемещений
@@ -95,23 +103,24 @@ class Snake:
 
 # Определяем класс Food для создания объекта еды
 class Food:
-    # Метод для установки новой позиции еды на экране
-    def new_location(self):
-        global food_x, food_y
-        food_x = random.randrange(1, int(500 / scale) - 1) * scale
-        food_y = random.randrange(1, int(500 / scale) - 1) * scale
+    # Метод для установки новой позиции еды и смены цвета
+    def new_location(self, snake_history):
+        global food_x, food_y, food_colour
+        while True:
+            food_x = random.randrange(1, int(500 / scale) - 1) * scale
+            food_y = random.randrange(1, int(500 / scale) - 1) * scale
+            # Проверка: не на змейке ли еда
+            overlap = False
+            for segment in snake_history:
+                if abs(food_x - segment[0]) < scale and abs(food_y - segment[1]) < scale:
+                    overlap = True
+                    break
+            if not overlap:
+                break  # Еда не пересекается со змейкой
+        # Меняем цвет еды каждый раз
+        food_colour = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
 
     # Метод для отображения еды на экране
-    def show(self):
-        pygame.draw.rect(display, food_colour, (food_x, food_y, scale))
-
-
-class Food:
-    def new_location(self):
-        global food_x, food_y
-        food_x = random.randrange(1, int(500 / scale) - 1) * scale
-        food_y = random.randrange(1, int(500 / scale) - 1) * scale
-
     def show(self):
         pygame.draw.rect(display, food_colour, (food_x, food_y, scale, scale))
 
@@ -129,36 +138,34 @@ def show_level():
 
 # Основной цикл игры
 def gameLoop():
-    global score
-    global level
-    global SPEED
+    global score, level, SPEED
 
     snake = Snake(500 / 2, 500 / 2)  # Создаем объект змейки
     food = Food()  # Создаем объект еды
-    food.new_location()  # Устанавливаем начальное положение еды
+    food.new_location(snake.history)  # Устанавливаем начальное положение еды
 
     while True:  # Бесконечный цикл игры
-        for event in pygame.event.get():  # Обработка событий
-            if event.type == pygame.QUIT:  # Если пользователь закрывает окно
-                pygame.quit()  # Завершаем работу Pygame
-                sys.exit()  # Завершаем выполнение программы
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:  # Если пользователь закрывает окно (завершаем)
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:  # Если пользователь нажимает клавишу
-                if event.key == pygame.K_q:  # Если нажата клавиша Q
-                    pygame.quit()  # Завершаем работу Pygame
-                    sys.exit()  # Завершаем выполнение программы
+                if event.key == pygame.K_q:  # Если нажата клавиша Q (завершаем)
+                    pygame.quit()
+                    sys.exit()
                 if snake.y_dir == 0:  # Если змейка движется по горизонтали
                     if event.key == pygame.K_UP:  # Если нажата клавиша Вверх
                         snake.x_dir = 0  # Устанавливаем направление движения по горизонтали в 0
                         snake.y_dir = -1  # Устанавливаем направление движения по вертикали вверх
-                    if event.key == pygame.K_DOWN:  # Если нажата клавиша Вниз
+                    elif event.key == pygame.K_DOWN:  # Если нажата клавиша Вниз
                         snake.x_dir = 0  # Устанавливаем направление движения по горизонтали в 0
                         snake.y_dir = 1  # Устанавливаем направление движения по вертикали вниз
 
-                if snake.x_dir == 0:  # Если змейка движется по вертикали
+                elif snake.x_dir == 0:  # Если змейка движется по вертикали
                     if event.key == pygame.K_LEFT:  # Если нажата клавиша Влево
                         snake.x_dir = -1  # Устанавливаем направление движения по горизонтали влево
                         snake.y_dir = 0  # Устанавливаем направление движения по вертикали в 0
-                    if event.key == pygame.K_RIGHT:  # Если нажата клавиша Вправо
+                    elif event.key == pygame.K_RIGHT:  # Если нажата клавиша Вправо
                         snake.x_dir = 1  # Устанавливаем направление движения по горизонтали вправо
                         snake.y_dir = 0  # Устанавливаем направление движения по вертикали в 0
 
@@ -178,12 +185,12 @@ def gameLoop():
         show_level()  # Отображаем уровень игры
 
         if snake.check_eaten():  # Если змейка съела еду
-            food.new_location()  # Устанавливаем новую позицию еды
+            food.new_location(snake.history)  # Устанавливаем новую позицию еды
             score += random.randint(1, 5)  # Увеличиваем счет на случайное значение
             snake.grow()  # Увеличиваем длину змейки
 
         if snake.check_level():  # Если достигнут новый уровень
-            food.new_location()  # Устанавливаем новую позицию еды
+            food.new_location(snake.history)  # Устанавливаем новую позицию еды
             level += 1  # Увеличиваем уровень
             SPEED += 1  # Увеличиваем скорость змейки
             snake.grow()  # Увеличиваем длину змейки
@@ -198,16 +205,16 @@ def gameLoop():
             time.sleep(3)  # Задержка перед сбросом игры
             snake.reset()  # Сбрасываем состояние змейки
 
-        if snake.history[0][0] > 500:  # Если змейка вышла за пределы правой границы
+        if snake.history[0][0] > 480:  # Если змейка вышла за пределы правой границы
             snake.history[0][0] = 0  # Перемещаем змейку на левую границу
 
         if snake.history[0][0] < 0:  # Если змейка вышла за пределы левой границы
-            snake.history[0][0] = 500  # Перемещаем змейку на правую границу
+            snake.history[0][0] = 480  # Перемещаем змейку на правую границу
             
-        if snake.history[0][1] > 500:
+        if snake.history[0][1] > 480:
             snake.history[0][1] = 0
         if snake.history[0][1] < 0:
-            snake.history[0][1] = 500
+            snake.history[0][1] = 480
 
         pygame.display.update()
         clock.tick(SPEED)

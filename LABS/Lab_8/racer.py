@@ -50,10 +50,9 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.move_ip(0, SPEED)
         if (self.rect.top > 600):
             SCORE += 1
-            self.rect.top = 0
             self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
 
-#added class Coin for coin to appear and to count the number of coins
+#Added class Coin for coin to appear and to count the number of coins
 c1,c2,c3,c4,c5 = False, False, False, False, False
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
@@ -66,7 +65,7 @@ class Coin(pygame.sprite.Sprite):
     def move(self):
         global COINS
         global SPEED
-        #adding different amount of coins depending on location of coin
+        #Adding different amount of coins depending on location of coin
         if self.rect.bottom<SCREEN_HEIGHT//3:
             COINS += 3
         elif self.rect.bottom<SCREEN_HEIGHT//1.5:
@@ -89,7 +88,6 @@ class Coin(pygame.sprite.Sprite):
         if not c5 and COINS>=50:
             SPEED+=1
             c5=True
-        self.rect.top = random.randint(40, SCREEN_WIDTH - 40)
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), random.randint(40, SCREEN_HEIGHT - 40))
 
 class Player(pygame.sprite.Sprite):
@@ -133,7 +131,32 @@ all_sprites.add(C1)
 INC_SPEED = pygame.USEREVENT + 1
 pygame.time.set_timer(INC_SPEED, 1000)
 
+# Adding a way to reset game
+def reset_game():
+    global SPEED, SCORE, COINS, c1, c2, c3, c4, c5, background_y
 
+    SPEED = 3
+    SCORE = 0
+    COINS = 0
+    background_y = 0
+    c1, c2, c3, c4, c5 = False, False, False, False, False
+
+    # Clear and reset all sprites
+    enemies.empty()
+    coinss.empty()
+    all_sprites.empty()
+
+    P1 = Player()
+    E1 = Enemy()
+    C1 = Coin()
+
+    enemies.add(E1)
+    coinss.add(C1)
+    all_sprites.add(P1, E1, C1)
+
+    return P1, E1, C1  # Return new sprites
+
+# Adding game over screen later lose with reset game
 def game_over_screen():
     screen.fill(RED)
     screen.blit(game_over, (120, 250))
@@ -146,12 +169,10 @@ def game_over_screen():
                 sys.exit()
             elif event.type == KEYDOWN:
                 if event.key == K_SPACE:  # Продолжить игру при нажатии на пробел
-                    return True
+                    return
                 elif event.key == K_ESCAPE:  # Закончить игру при нажатии на ESC
-                    return False
-
-def handle_crash():
-    time.sleep(2)
+                    pygame.quit()
+                    sys.exit()
 
 background_y = 0  # Initialize background y-coordinate
 
@@ -162,15 +183,14 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
+            for entity in all_sprites:
+                entity.kill() 
 
     # If there is a collision between a player and an enemy
     if pygame.sprite.spritecollideany(P1, enemies):
         game_over_screen()
-        continue_game = handle_crash()
-        for entity in all_sprites:
-            entity.kill() 
-        pygame.quit()
-        sys.exit()
+        time.sleep(2)
+        P1, E1, C1 = reset_game()
 
     # Scroll the background
     background_y = (background_y + SPEED) % background.get_height()
