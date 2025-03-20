@@ -30,7 +30,7 @@ font = pygame.font.SysFont("comicsansms", 30)
 font_small = pygame.font.SysFont("comicsansms", 20)
 game_over = font.render("Game Over!", True, BLACK)
 
-background = pygame.image.load("LABS/Lab_8/AnimatedStreet.png")
+background = pygame.image.load("LABS/Lab_8/images_and_sounds/AnimatedStreet.png")
 
 # Create a white screen
 screen = pygame.display.set_mode((400, 600))
@@ -41,7 +41,7 @@ pygame.display.set_caption("Racer")
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("LABS/Lab_8/Enemy.png")
+        self.image = pygame.image.load("LABS/Lab_8/images_and_sounds/Enemy.png")
         self.rect = self.image.get_rect()
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
 
@@ -57,7 +57,7 @@ c1,c2,c3,c4,c5 = False, False, False, False, False
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("LABS/Lab_8/coin.png")
+        self.image = pygame.image.load("LABS/Lab_8/images_and_sounds/coin.png")
         self.image = pygame.transform.scale(self.image, (40, 40))
         self.rect = self.image.get_rect()
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), random.randint(40, SCREEN_HEIGHT - 40))
@@ -93,7 +93,7 @@ class Coin(pygame.sprite.Sprite):
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("LABS/Lab_8/Player.png")
+        self.image = pygame.image.load("LABS/Lab_8/images_and_sounds/Player.png")
         self.rect = self.image.get_rect()
         self.rect.center = (160, 520)
 
@@ -158,6 +158,7 @@ def reset_game():
 
 # Adding game over screen later lose with reset game
 def game_over_screen():
+    pygame.mixer.Sound("LABS/Lab_8/images_and_sounds/crash.wav").play()
     screen.fill(RED)
     screen.blit(game_over, (120, 250))
     pygame.display.update()
@@ -175,12 +176,13 @@ def game_over_screen():
                     sys.exit()
 
 background_y = 0  # Initialize background y-coordinate
+pygame.mixer.Sound("LABS/Lab_8/images_and_sounds/background.wav").play(-1)
 
 while True:
     for event in pygame.event.get():
         if event.type == INC_SPEED:
             SPEED += 0.1
-        if event.type == QUIT:
+        elif event.type == QUIT:
             pygame.quit()
             sys.exit()
             for entity in all_sprites:

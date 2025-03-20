@@ -206,17 +206,18 @@ def gameLoop():
             snake.reset()  # Сбрасываем состояние змейки
 
         if snake.history[0][0] > 480:  # Если змейка вышла за пределы правой границы
-            snake.history[0][0] = 0  # Перемещаем змейку на левую границу
+            snake.history[0][0] = 0
 
-        if snake.history[0][0] < 0:  # Если змейка вышла за пределы левой границы
-            snake.history[0][0] = 480  # Перемещаем змейку на правую границу
+        elif snake.history[0][0] < 0:  # Если змейка вышла за пределы левой границы
+            snake.history[0][0] = 480
             
-        if snake.history[0][1] > 480:
+        elif snake.history[0][1] > 480:  # Если змейка вышла за пределы нижней границы
             snake.history[0][1] = 0
-        if snake.history[0][1] < 0:
+
+        elif snake.history[0][1] < 0:  # Если змейка вышла за пределы верхней границы
             snake.history[0][1] = 480
 
-        pygame.display.update()
+        pygame.display.update()  # Отображаем все в реальном времени
         clock.tick(SPEED)
 
 gameLoop()
