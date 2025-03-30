@@ -26,11 +26,11 @@ COINS = 0
 
 
 # Setting up Fonts
-font = pygame.font.SysFont("Verdana", 20)
-font_small = pygame.font.SysFont("Verdana", 20)
-game_over = font.render("Game Over", True, BLACK)
+font = pygame.font.SysFont("comicsansms", 30)
+font_small = pygame.font.SysFont("comicsansms", 20)
+game_over = font.render("Game Over!", True, BLACK)
 
-background = pygame.image.load("AnimatedStreet.png")
+background = pygame.image.load("LABS/Lab_8/images_and_sounds/AnimatedStreet.png")
 
 # Create a white screen
 screen = pygame.display.set_mode((400, 600))
@@ -41,7 +41,7 @@ pygame.display.set_caption("Racer")
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("Enemy.png")
+        self.image = pygame.image.load("LABS/Lab_8/images_and_sounds/Enemy.png")
         self.rect = self.image.get_rect()
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
 
@@ -50,15 +50,14 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.move_ip(0, SPEED)
         if (self.rect.top > 600):
             SCORE += 1
-            self.rect.top = 0
             self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
 
-#added class Coin for coin to appear and to count the number of coins
+#Added class Coin for coin to appear and to count the number of coins
 c1,c2,c3,c4,c5 = False, False, False, False, False
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("coin.png")
+        self.image = pygame.image.load("LABS/Lab_8/images_and_sounds/coin.png")
         self.image = pygame.transform.scale(self.image, (40, 40))
         self.rect = self.image.get_rect()
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), random.randint(40, SCREEN_HEIGHT - 40))
@@ -66,7 +65,7 @@ class Coin(pygame.sprite.Sprite):
     def move(self):
         global COINS
         global SPEED
-        #adding different amount of coins depending on location of coin
+        #Adding different amount of coins depending on location of coin
         if self.rect.bottom<SCREEN_HEIGHT//3:
             COINS += 3
         elif self.rect.bottom<SCREEN_HEIGHT//1.5:
@@ -89,13 +88,12 @@ class Coin(pygame.sprite.Sprite):
         if not c5 and COINS>=50:
             SPEED+=1
             c5=True
-        self.rect.top = random.randint(40, SCREEN_WIDTH - 40)
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), random.randint(40, SCREEN_HEIGHT - 40))
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("Player.png")
+        self.image = pygame.image.load("LABS/Lab_8/images_and_sounds/Player.png")
         self.rect = self.image.get_rect()
         self.rect.center = (160, 520)
 
@@ -133,10 +131,36 @@ all_sprites.add(C1)
 INC_SPEED = pygame.USEREVENT + 1
 pygame.time.set_timer(INC_SPEED, 1000)
 
+# Adding a way to reset game
+def reset_game():
+    global SPEED, SCORE, COINS, c1, c2, c3, c4, c5, background_y
 
+    SPEED = 3
+    SCORE = 0
+    COINS = 0
+    background_y = 0
+    c1, c2, c3, c4, c5 = False, False, False, False, False
+
+    # Clear and reset all sprites
+    enemies.empty()
+    coinss.empty()
+    all_sprites.empty()
+
+    P1 = Player()
+    E1 = Enemy()
+    C1 = Coin()
+
+    enemies.add(E1)
+    coinss.add(C1)
+    all_sprites.add(P1, E1, C1)
+
+    return P1, E1, C1  # Return new sprites
+
+# Adding game over screen later lose with reset game
 def game_over_screen():
+    pygame.mixer.Sound("LABS/Lab_8/images_and_sounds/crash.wav").play()
     screen.fill(RED)
-    screen.blit(game_over, (30, 250))
+    screen.blit(game_over, (120, 250))
     pygame.display.update()
 
     while True:
@@ -146,29 +170,29 @@ def game_over_screen():
                 sys.exit()
             elif event.type == KEYDOWN:
                 if event.key == K_SPACE:  # Продолжить игру при нажатии на пробел
-                    return True
+                    return
                 elif event.key == K_ESCAPE:  # Закончить игру при нажатии на ESC
-                    return False
-
-def handle_crash():
-    time.sleep(2)
+                    pygame.quit()
+                    sys.exit()
 
 background_y = 0  # Initialize background y-coordinate
+pygame.mixer.Sound("LABS/Lab_8/images_and_sounds/background.wav").play(-1)
 
 while True:
     for event in pygame.event.get():
         if event.type == INC_SPEED:
             SPEED += 0.1
-        if event.type == QUIT:
+        elif event.type == QUIT:
             pygame.quit()
             sys.exit()
+            for entity in all_sprites:
+                entity.kill() 
 
     # If there is a collision between a player and an enemy
     if pygame.sprite.spritecollideany(P1, enemies):
-        continue_game = handle_crash()
-        if not continue_game:
-            pygame.quit()
-            sys.exit()
+        game_over_screen()
+        time.sleep(2)
+        P1, E1, C1 = reset_game()
 
     # Scroll the background
     background_y = (background_y + SPEED) % background.get_height()
