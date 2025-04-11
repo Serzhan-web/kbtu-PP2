@@ -7,6 +7,7 @@ draw = False   #indicating whether to draw on the screen
 radius = 2    #Brush radius
 color = 'blue'           
 mode = 'pen'                
+fill = False
  
 pygame.init() 
 screen = pygame.display.set_mode([WIDTH, HEIGHT]) #Creating a window of specified sizes
@@ -56,8 +57,6 @@ def drawLine(screen, start, end, width, color):
             x = (-C - B * y) / A 
             # Draw a circle (pixel) at (x, y) position
             pygame.draw.circle(screen, pygame.Color(color), (x, y), width)
-
- 
  
 def drawCircle(screen, start, end, width, color): 
     # Extract x and y coordinates of start and end points
@@ -75,8 +74,6 @@ def drawCircle(screen, start, end, width, color):
     
     # Draw the circle on the screen
     pygame.draw.circle(screen, pygame.Color(color), (x, y), radius, width)  # Draw the circle on the screen
-
- 
  
 def drawRectangle(screen, start, end, width, color): 
     # Extract x and y coordinates of start and end points
@@ -99,16 +96,12 @@ def drawRectangle(screen, start, end, width, color):
     if x2 > x1 and y1 > y2: 
         pygame.draw.rect(screen, pygame.Color(color), (x1, y2, widthr, height), width)  # Draw the rectangle on the screen
 
-     
- 
- 
 def drawSquare(screen, start, end, color): 
     x1 = start[0] 
     x2 = end[0] 
     y1 = start[1] 
     y2 = end[1] 
     mn = min(abs(x2 - x1), abs(y2 - y1)) 
- 
  
     if x2 > x1 and y2 > y1: 
         pygame.draw.rect(screen, pygame.Color(color), (x1, y1, mn, mn)) 
@@ -134,7 +127,6 @@ def drawRightTriangle(screen, start, end, color):
     if x2 > x1 and y1 > y2: 
         pygame.draw.polygon(screen, pygame.Color(color), ((x1, y1), (x2, y2), (x2, y1))) 
  
- 
 def drawEquilateralTriangle(screen, start, end, width, color): 
     x1 = start[0] 
     x2 = end[0] 
@@ -149,7 +141,6 @@ def drawEquilateralTriangle(screen, start, end, width, color):
     else: 
         pygame.draw.polygon(screen, pygame.Color(color), ((x1, y1), (x2, y1), ((x1 + x2) / 2, y1 - height))) 
      
- 
 def drawRhombus(screen, start, end, width, color): 
     x1 = start[0] 
     x2 = end[0] 
@@ -177,6 +168,11 @@ while True:
                 mode = 'square'  # Set the mode to draw squares
             if event.key == pygame.K_q: 
                 screen.fill(pygame.Color('white'))  # Clear the screen by filling it with white color
+
+            if event.key == pygame.K_f:
+                fill = not fill  #  switching between fill and contour
+            if event.key == pygame.K_RETURN:  # ENTER saved
+                pygame.image.save(screen, "drawing.png") 
  
             # Change the color based on the pressed key
             if event.key == pygame.K_1: 
@@ -195,34 +191,40 @@ while True:
                 mode = 'eq_tri'  # Set the mode to draw equilateral triangles
             if event.key == pygame.K_h: 
                 mode = 'rhombus'  # Set the mode to draw rhombuses
-   
- 
+    
+            if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:  # keys "+"
+                radius += 1
+                if radius > 100:
+                    radius = 100  # lesser 101
+
+            if event.key == pygame.K_MINUS: # keys "-"
+                radius -= 1
+                if radius < 1:
+                    radius = 1  # bigger 0
       
         if event.type == pygame.MOUSEBUTTONDOWN:  
             draw = True  # Enable drawing
             if mode == 'pen': 
                 pygame.draw.circle(screen, pygame.Color(color), event.pos, radius)  # Draw a circle (pixel) if the pen mode is active
             prevPos = event.pos  # Store the current position as the previous position
-
- 
         
         if event.type == pygame.MOUSEBUTTONUP:  
+            w = 0 if fill else radius  # choose 
+
         # When the mouse button is released
             if mode == 'rectangle': 
-                drawRectangle(screen, prevPos, event.pos, radius, color)  # Draw a rectangle if the mode is set to draw rectangles
+                drawRectangle(screen, prevPos, event.pos, w, color)  # Draw a rectangle if the mode is set to draw rectangles
             elif mode == 'circle': 
-                drawCircle(screen, prevPos, event.pos, radius, color)  # Draw a circle if the mode is set to draw circles
+                drawCircle(screen, prevPos, event.pos, w, color)  # Draw a circle if the mode is set to draw circles
             elif mode == 'square': 
                 drawSquare(screen, prevPos, event.pos, color)  # Draw a square if the mode is set to draw squares
             elif mode == 'right_tri': 
                 drawRightTriangle(screen, prevPos, event.pos, color)  # Draw a right triangle if the mode is set to draw right triangles
             elif mode == 'eq_tri': 
-                drawEquilateralTriangle(screen, prevPos, event.pos, radius, color)  # Draw an equilateral triangle if the mode is set to draw equilateral triangles
+                drawEquilateralTriangle(screen, prevPos, event.pos, w, color)  # Draw an equilateral triangle if the mode is set to draw equilateral triangles
             elif mode == 'rhombus': 
-                drawRhombus(screen, prevPos, event.pos, radius, color)  # Draw a rhombus if the mode is set to draw rhombuses
+                drawRhombus(screen, prevPos, event.pos, w, color)  # Draw a rhombus if the mode is set to draw rhombuses
             draw = False  # Disable drawing
-
- 
        
         if event.type == pygame.MOUSEMOTION:  
         # When the mouse is moved
@@ -233,8 +235,9 @@ while True:
             lastPos = event.pos  # Update the last position to the current position
  
     # Draw a rectangle to display the radius information
-    pygame.draw.rect(screen, pygame.Color('white'), (5, 5, 115, 75))  # Draw a white rectangle to display the radius information
-    renderRadius = font.render(str(radius), True, pygame.Color(color))  # Render the text showing the current radius
+    pygame.draw.rect(screen, pygame.Color('white'), (5, 5, 100, 60))  # Draw a white rectangle to display the radius information
+    pygame.draw.rect(screen, pygame.Color('black'), (5, 5, 100, 60), 2) 
+    renderRadius = font.render(f'R: {radius}', True, pygame.Color('black'))  # Render the text showing the current radius
     screen.blit(renderRadius, (5, 5))  # Blit the rendered text onto the screen at the specified position
  
     pygame.display.flip()  # Update the display
