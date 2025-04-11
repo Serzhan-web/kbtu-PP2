@@ -1,7 +1,7 @@
 import pygame 
  
  
-WIDTH, HEIGHT = 1200, 800  #Defines the width and height of the game window.
+WIDTH, HEIGHT = 1200, 600  #Defines the width and height of the game window.
 FPS = 90 #screen refresh rate
 draw = False   #indicating whether to draw on the screen           
 radius = 2    #Brush radius
@@ -14,7 +14,7 @@ screen = pygame.display.set_mode([WIDTH, HEIGHT]) #Creating a window of specifie
 pygame.display.set_caption('Paint') #name window 
 clock = pygame.time.Clock() #for time management
 screen.fill(pygame.Color('white'))  #Fills the screen with white.
-font = pygame.font.SysFont('None', 60) #Creating a font to display text
+font = pygame.font.SysFont('None', 30) #Creating a font to display text
  
  
 def drawLine(screen, start, end, width, color): 
@@ -96,36 +96,35 @@ def drawRectangle(screen, start, end, width, color):
     if x2 > x1 and y1 > y2: 
         pygame.draw.rect(screen, pygame.Color(color), (x1, y2, widthr, height), width)  # Draw the rectangle on the screen
 
-def drawSquare(screen, start, end, color): 
-    x1 = start[0] 
-    x2 = end[0] 
-    y1 = start[1] 
-    y2 = end[1] 
-    mn = min(abs(x2 - x1), abs(y2 - y1)) 
+def drawSquare(screen, start, end, color, width=0):
+    x1, y1 = start
+    x2, y2 = end
+    mn = min(abs(x2 - x1), abs(y2 - y1))
+
+    if x2 > x1 and y2 > y1:
+        pygame.draw.rect(screen, pygame.Color(color), (x1, y1, mn, mn), width)
+    if y2 > y1 and x1 > x2:
+        pygame.draw.rect(screen, pygame.Color(color), (x2, y1, mn, mn), width)
+    if x1 > x2 and y1 > y2:
+        pygame.draw.rect(screen, pygame.Color(color), (x2, y2, mn, mn), width)
+    if x2 > x1 and y1 > y2:
+        pygame.draw.rect(screen, pygame.Color(color), (x1, y2, mn, mn), width)
  
-    if x2 > x1 and y2 > y1: 
-        pygame.draw.rect(screen, pygame.Color(color), (x1, y1, mn, mn)) 
-    if y2 > y1 and x1 > x2: 
-        pygame.draw.rect(screen, pygame.Color(color), (x2, y1, mn, mn)) 
-    if x1 > x2 and y1 > y2: 
-        pygame.draw.rect(screen, pygame.Color(color), (x2, y2, mn, mn)) 
-    if x2 > x1 and y1 > y2: 
-        pygame.draw.rect(screen, pygame.Color(color), (x1, y2, mn, mn)) 
- 
-def drawRightTriangle(screen, start, end, color): 
-    x1 = start[0] 
-    x2 = end[0] 
-    y1 = start[1] 
-    y2 = end[1] 
-     
-    if x2 > x1 and y2 > y1: 
-        pygame.draw.polygon(screen, pygame.Color(color), ((x1, y1), (x2, y2), (x1, y2))) 
-    if y2 > y1 and x1 > x2: 
-        pygame.draw.polygon(screen, pygame.Color(color), ((x1, y1), (x2, y2), (x1, y2))) 
-    if x1 > x2 and y1 > y2: 
-        pygame.draw.polygon(screen, pygame.Color(color), ((x1, y1), (x2, y2), (x2, y1))) 
-    if x2 > x1 and y1 > y2: 
-        pygame.draw.polygon(screen, pygame.Color(color), ((x1, y1), (x2, y2), (x2, y1))) 
+def drawRightTriangle(screen, start, end, color, width):
+    x1, y1 = start
+    x2, y2 = end
+
+    points = []
+    if x2 > x1 and y2 > y1:
+        points = [(x1, y1), (x2, y2), (x1, y2)]
+    elif y2 > y1 and x1 > x2:
+        points = [(x1, y1), (x2, y2), (x1, y2)]
+    elif x1 > x2 and y1 > y2:
+        points = [(x1, y1), (x2, y2), (x2, y1)]
+    elif x2 > x1 and y1 > y2:
+        points = [(x1, y1), (x2, y2), (x2, y1)]
+
+    pygame.draw.polygon(screen, pygame.Color(color), points, width)
  
 def drawEquilateralTriangle(screen, start, end, width, color): 
     x1 = start[0] 
@@ -166,6 +165,12 @@ while True:
                 mode = 'erase'  # Set the mode to erase
             if event.key == pygame.K_s: 
                 mode = 'square'  # Set the mode to draw squares
+            if event.key == pygame.K_t: 
+                mode = 'right_tri'  # Set the mode to draw right triangles
+            if event.key == pygame.K_u: 
+                mode = 'eq_tri'  # Set the mode to draw equilateral triangles
+            if event.key == pygame.K_h: 
+                mode = 'rhombus'  # Set the mode to draw rhombuses
             if event.key == pygame.K_q: 
                 screen.fill(pygame.Color('white'))  # Clear the screen by filling it with white color
 
@@ -185,13 +190,11 @@ while True:
                 color = 'blue'  # Set the color to blue
             if event.key == pygame.K_5: 
                 color = 'yellow'  # Set the color to yellow
-            if event.key == pygame.K_t: 
-                mode = 'right_tri'  # Set the mode to draw right triangles
-            if event.key == pygame.K_u: 
-                mode = 'eq_tri'  # Set the mode to draw equilateral triangles
-            if event.key == pygame.K_h: 
-                mode = 'rhombus'  # Set the mode to draw rhombuses
-    
+            if event.key == pygame.K_6: 
+                color = 'purple'  # Set the color to yellow
+            if event.key == pygame.K_7: 
+                color = 'orange'  # Set the color to yellow
+            
             if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:  # keys "+"
                 radius += 1
                 if radius > 100:
@@ -209,7 +212,7 @@ while True:
             prevPos = event.pos  # Store the current position as the previous position
         
         if event.type == pygame.MOUSEBUTTONUP:  
-            w = 0 if fill else radius  # choose 
+            w = 0 if fill else radius  # choose size of contour
 
         # When the mouse button is released
             if mode == 'rectangle': 
@@ -217,9 +220,9 @@ while True:
             elif mode == 'circle': 
                 drawCircle(screen, prevPos, event.pos, w, color)  # Draw a circle if the mode is set to draw circles
             elif mode == 'square': 
-                drawSquare(screen, prevPos, event.pos, color)  # Draw a square if the mode is set to draw squares
+                drawSquare(screen, prevPos, event.pos, color, w)  # Draw a square if the mode is set to draw squares
             elif mode == 'right_tri': 
-                drawRightTriangle(screen, prevPos, event.pos, color)  # Draw a right triangle if the mode is set to draw right triangles
+                drawRightTriangle(screen, prevPos, event.pos, color, w)  # Draw a right triangle if the mode is set to draw right triangles
             elif mode == 'eq_tri': 
                 drawEquilateralTriangle(screen, prevPos, event.pos, w, color)  # Draw an equilateral triangle if the mode is set to draw equilateral triangles
             elif mode == 'rhombus': 
@@ -235,10 +238,18 @@ while True:
             lastPos = event.pos  # Update the last position to the current position
  
     # Draw a rectangle to display the radius information
-    pygame.draw.rect(screen, pygame.Color('white'), (5, 5, 100, 60))  # Draw a white rectangle to display the radius information
-    pygame.draw.rect(screen, pygame.Color('black'), (5, 5, 100, 60), 2) 
+    pygame.draw.rect(screen, pygame.Color('white'), (5, 5, 170, 110))  # Draw a white rectangle to display the radius information
+    pygame.draw.rect(screen, pygame.Color('black'), (5, 5, 170, 110), 2) # black rectangle contour
+
     renderRadius = font.render(f'R: {radius}', True, pygame.Color('black'))  # Render the text showing the current radius
-    screen.blit(renderRadius, (5, 5))  # Blit the rendered text onto the screen at the specified position
+    color_text = font.render(f'Color: {color}', True, pygame.Color('black'))
+    mode_text = font.render(f'Mode: {mode}', True, pygame.Color('black'))
+    fill_text = font.render(f'Fill: {fill}', True, pygame.Color('black'))
+
+    screen.blit(renderRadius, (10, 7))  # Blit the rendered text onto the screen at the specified position
+    screen.blit(color_text, (10, 30))
+    screen.blit(mode_text, (10, 60))
+    screen.blit(fill_text, (10, 90))
  
     pygame.display.flip()  # Update the display
     clock.tick(FPS)  # Control the frame rate
