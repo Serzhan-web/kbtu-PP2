@@ -26,7 +26,7 @@ fps = pygame.time.Clock()
 paused = False 
 
 def insert_score(name, score, level): 
-    conn = psycopg2.connect(dbname='lab10', user='postgres', password='Almaty250505', host='localhost', port='5433') 
+    conn = psycopg2.connect(dbname='lab10', user='postgres', password='Almaty250505', host='localhost', port='5432') 
     cur = conn.cursor() 
     insert_query = "INSERT INTO snake_game_scores (player_name, score, level) VALUES (%s, %s, %s)" 
     cur.execute(insert_query, (name, score, level)) 

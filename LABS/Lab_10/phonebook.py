@@ -1,10 +1,9 @@
 import psycopg2
 import csv
-import pandas as pd
 from tabulate import tabulate 
 
 conn = psycopg2.connect(host="localhost", dbname = "lab10", user = "postgres",
-                        password = "Almaty250505", port = 5433)
+                        password = "Almaty250505", port = 5432)
 
 cur = conn.cursor()
 
@@ -16,13 +15,13 @@ cur.execute("""CREATE TABLE IF NOT EXISTS phonebook (
 
 )
 """)
-#filepath = "/Users/bekzatshaiyrgozha/Documents/PP2/lab10/student.csv"  
+#filepath = "c:/Users/Lenovo/Desktop/All_Labs/LABS/Lab_10/student.csv"
 #with open(filepath, 'r') as f:
    
-#    next(f)
-#    reader = csv.reader(f)
-#    for row in reader:
-#        cur.execute("INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
+    #next(f)
+    #reader = csv.reader(f)
+    #for row in reader:
+        #cur.execute("INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
 
 #conn.commit()
 
