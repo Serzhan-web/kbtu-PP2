@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import psycopg2
+from tabulate import tabulate 
 
 pygame.init()
 
@@ -22,9 +23,13 @@ food = {'pos': [0, 0], 'weight': 1, 'spawn_time': 0}
 food_spawn = True
 score = 0
 level = 1
-speed_increase = 0.1
+speed_increase = 10
 food_counter = 0
 paused = False
+
+command = ''
+start = True
+back = False
 
 fps = pygame.time.Clock()
 
@@ -52,6 +57,7 @@ def get_user_id(username):
     conn.close()
     return user_id
 
+
 def insert_score(user_id, score, level):
     conn = psycopg2.connect(**DB_PARAMS)
     cur = conn.cursor()
@@ -75,6 +81,16 @@ def get_user_scores(user_id):
     conn.close()
     return results
 
+def delete_user_scores_for_user():
+    conn = psycopg2.connect(**DB_PARAMS)
+    cur = conn.cursor()
+    global command
+    command = ''
+    username_var = str(input('Type username which you want to delete their score: '))
+    user_id = get_user_id(username_var)
+    cur.execute("DELETE FROM user_scores WHERE user_id = %s", (user_id,))
+    conn.commit()
+
 def check_collision(pos):
     if pos[0] < 0 or pos[0] >= SCREEN_WIDTH or pos[1] < 0 or pos[1] >= SCREEN_HEIGHT:
         return True
@@ -90,6 +106,40 @@ def get_random_food():
             weight = 2 if food_counter >= 2 else 1
             food_counter = 0 if weight == 2 else food_counter + 1
             return {'pos': pos, 'weight': weight, 'spawn_time': pygame.time.get_ticks()}
+
+check = True
+while check:
+    if start == True or back == True:
+        start = False
+        print("""
+        List of the commands:
+        1. Type "d" or "D" in order to DELETE data from the table.
+        2. Type "f" or "F" in order to close the program.
+        3. Type "s" or "S" in order to see the values in the table.
+        """)
+        command = str(input())
+
+        if command == "d" or command == "D":
+            delete_user_scores_for_user()
+            back_com = str(input('Type "back" in order to return to the list of the commands: '))
+            if back_com == "back":
+                back = True
+                
+        if command == "s" or command == "S":
+            back = False
+            command = ''
+            conn = psycopg2.connect(**DB_PARAMS)
+            cur = conn.cursor()
+            cur.execute("SELECT * from user_scores;")
+            rows = cur.fetchall()
+            print(tabulate(rows, headers=["ID", "User_score", "Level", "Created_at"], tablefmt='fancy_grid'))
+            back_com = str(input('Type "back" in order to return to the list of the commands: '))
+            if back_com == "back":
+                back = True
+        #finish
+        if command == "f" or command == "F":
+            command = ''
+            check = False
 
 # --- Ввод имени и загрузка ---
 player_name = input("Enter your username: ").strip()
