@@ -100,16 +100,16 @@ class Player(pygame.sprite.Sprite):
         pressed_keys = pygame.key.get_pressed()
         if self.rect.left > 0:
             if pressed_keys[K_LEFT]:
-                self.rect.move_ip(-5, 0)
+                self.rect.move_ip(-10, 0)
         if self.rect.right < SCREEN_WIDTH:
             if pressed_keys[K_RIGHT]:
-                self.rect.move_ip(5, 0)
+                self.rect.move_ip(10, 0)
         if self.rect.top > 0:
             if pressed_keys[K_UP]:
-                self.rect.move_ip(0, -5)
+                self.rect.move_ip(0, -10)
         if self.rect.bottom < SCREEN_HEIGHT:
             if pressed_keys[K_DOWN]:
-                self.rect.move_ip(0, 5)
+                self.rect.move_ip(0, 10)
                 
 # Setting up Sprites
 P1 = Player()
@@ -192,7 +192,7 @@ while True:
         HEALTH -= 1
         if HEALTH == 0:
             game_over_screen()
-            time.sleep(2)
+            time.sleep(0.5)
             P1, E1, C1 = reset_game()
         else:
             enemy.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
